@@ -30,9 +30,10 @@ router.get('/:id', async (req, res) => {
 
 // Create match
 router.post('/', async (req, res) => {
-  console.log("posting a match");
-  const match = new Match(req.body)
   try {
+    const last = await Match.findOne().sort({ partijID: -1 }).select('partijID')
+    const partijID = (last?.partijID || 0) + 1
+    const match = new Match({ ...req.body, partijID })
     const saved = await match.save()
     res.status(201).json(saved)
   } catch (err) {

@@ -10,6 +10,7 @@
     <v-main class="bg-grey-lighten-4">
       <v-container class="py-8">
         <SpelerStats class="mb-6" />
+        <SpelerStatBeheer class="mb-6" />
         <MatchForm @saved="loadMatches" />
         <MatchList :matches="matches" @deleted="loadMatches" class="mt-6" />
       </v-container>
@@ -23,6 +24,7 @@ import axios from 'axios'
 import MatchForm from './components/MatchForm.vue'
 import MatchList from './components/MatchList.vue'
 import SpelerStats from './components/SpelerStats.vue'
+import SpelerStatBeheer from './components/SpelerStatBeheer.vue'
 
 const matches = ref([])
 

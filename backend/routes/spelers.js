@@ -11,10 +11,27 @@ router.get('/seizoenen', async (_req, res) => {
   }
 })
 
+router.get('/weken', async (req, res) => {
+  try {
+    const match = {}
+    if (req.query.seizoen) match.seizoenID = parseInt(req.query.seizoen)
+
+    const weken = await Partij.aggregate([
+      { $match: match },
+      { $group: { _id: { $isoWeek: '$datum' } } },
+      { $sort: { _id: 1 } }
+    ])
+    res.json(weken.map(w => w._id).filter(Boolean))
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 router.get('/', async (req, res) => {
   try {
     const match = {}
     if (req.query.seizoen) match.seizoenID = parseInt(req.query.seizoen)
+    if (req.query.week) match.$expr = { $eq: [{ $isoWeek: '$datum' }, parseInt(req.query.week)] }
 
     const stats = await Partij.aggregate([
       { $match: match },
@@ -71,6 +88,51 @@ router.get('/', async (req, res) => {
       { $sort: { naam: 1 } }
     ])
     res.json(stats)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+router.get('/:id/partijen', async (req, res) => {
+  try {
+    const match = { spelerID: parseInt(req.params.id) }
+    if (req.query.seizoen) match.seizoenID = parseInt(req.query.seizoen)
+    if (req.query.week) match.$expr = { $eq: [{ $isoWeek: '$datum' }, parseInt(req.query.week)] }
+
+    const partijen = await Partij.aggregate([
+      { $match: match },
+      {
+        $lookup: {
+          from: 'lids',
+          localField: 'tegenstanderID',
+          foreignField: 'lidNummer',
+          as: 'tegenstander'
+        }
+      },
+      { $unwind: { path: '$tegenstander', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          datum: 1,
+          seizoenID: 1,
+          caramboles: 1,
+          aantalCaramboles: 1,
+          beurten: 1,
+          hoogsteSet: 1,
+          gemiddelde: 1,
+          teHalenGemiddelde: 1,
+          plusMin: 1,
+          tegenstander: {
+            $cond: {
+              if: { $gt: [{ $strLenCP: { $ifNull: ['$tegenstander.schermnaam', ''] } }, 0] },
+              then: '$tegenstander.schermnaam',
+              else: { $concat: [{ $ifNull: ['$tegenstander.voornaam', 'Onbekend'] }, ' ', { $ifNull: ['$tegenstander.achternaam', ''] }] }
+            }
+          }
+        }
+      },
+      { $sort: { datum: -1 } }
+    ])
+    res.json(partijen)
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
