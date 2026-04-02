@@ -81,7 +81,23 @@ router.get('/', async (req, res) => {
             ]
           },
           hoogsteSet: 1,
-          plusMin: { $round: ['$totaalPlusMin', 3] },
+          plusMin: {
+            $cond: [
+              { $gt: ['$gemiddeldeTeHalen', 0] },
+              {
+                $round: [
+                  {
+                    $multiply: [
+                      { $divide: [{ $subtract: [{ $divide: ['$totaalCaramboles', '$totaalBeurten'] }, '$gemiddeldeTeHalen'] }, '$gemiddeldeTeHalen'] },
+                      100
+                    ]
+                  },
+                  2
+                ]
+              },
+              0
+            ]
+          },
           teHalenGemiddelde: { $round: ['$gemiddeldeTeHalen', 3] },
           gemiddeldePartij: { $round: ['$gemiddeldePartij', 3] }
         }

@@ -46,6 +46,10 @@
         {{ item.gewonnen }} / {{ item.aantalPartijen }}
       </template>
 
+      <template #item.plusMin="{ item }">
+        {{ item.plusMin }}%
+      </template>
+
       <template #no-data>
         <div class="pa-8 text-center text-grey">
           <v-icon size="48" class="mb-2">mdi-account-off</v-icon>
@@ -115,7 +119,7 @@ const headers = [
   { title: 'Caramboles', key: 'totaalCaramboles', sortable: true },
   { title: 'Beurten', key: 'beurten', sortable: true },
   { title: 'Te halen gem.', key: 'teHalenGemiddelde', sortable: true },
-  { title: 'Gemiddelde', key: 'gemiddeldePartij', sortable: true },
+  { title: 'Gemiddelde', key: 'gemiddelde', sortable: true },
   { title: 'Plus/Min', key: 'plusMin', sortable: true },
   { title: 'Hoogste serie', key: 'hoogsteSet', sortable: true }
 ]
