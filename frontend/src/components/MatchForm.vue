@@ -160,7 +160,14 @@ const leden = ref([])
 const spelerID = ref(null)
 const tegenstanderID = ref(null)
 const seizoenID = ref(null)
-const datum = ref(new Date().toISOString().slice(0, 10))
+function lastWednesday() {
+  const d = new Date()
+  const daysBack = (d.getDay() + 4) % 7  // days since last Wednesday (0 if today is Wednesday)
+  d.setDate(d.getDate() - daysBack)
+  return d.toISOString().slice(0, 10)
+}
+
+const datum = ref(lastWednesday())
 
 const beurten = ref(null)
 const emptyStats = () => ({ caramboles: null, aantalCaramboles: null, hoogsteSet: null, teHalenGemiddelde: null, gemiddelde: null, plusMin: null })
@@ -224,7 +231,7 @@ function reset() {
   spelerID.value = null
   tegenstanderID.value = null
   seizoenID.value = null
-  datum.value = new Date().toISOString().slice(0, 10)
+  datum.value = lastWednesday()
   beurten.value = null
   speler.value = emptyStats()
   tegenstander.value = emptyStats()
@@ -232,10 +239,14 @@ function reset() {
 }
 
 onMounted(async () => {
-  const { data } = await axios.get('/api/leden')
-  leden.value = data.map(l => ({
+  const [ledenRes, seizoenenRes] = await Promise.all([
+    axios.get('/api/leden'),
+    axios.get('/api/spelers/seizoenen')
+  ])
+  leden.value = ledenRes.data.map(l => ({
     lidNummer: l.lidNummer,
     label: l.schermnaam || `${l.voornaam} ${l.achternaam}`
   }))
+  if (seizoenenRes.data.length) seizoenID.value = seizoenenRes.data[0]
 })
 </script>

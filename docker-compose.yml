@@ -4,8 +4,6 @@ services:
     restart: unless-stopped
     volumes:
       - mongo_data:/data/db
-    ports:
-      - "27018:27017"
 
   backend:
     build: ./backend

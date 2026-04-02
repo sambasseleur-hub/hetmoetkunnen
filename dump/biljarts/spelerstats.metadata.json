@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"spelerID":{"$numberInt":"1"},"seizoenID":{"$numberInt":"1"}},"name":"spelerID_1_seizoenID_1","background":true,"unique":true}],"uuid":"bb940f021bac483db6b153e3f6fe5e22","collectionName":"spelerstats","type":"collection"}
