@@ -228,14 +228,16 @@ async function submit() {
 }
 
 function reset() {
+  const keepDatum = datum.value
+  const keepSeizoen = seizoenID.value
   spelerID.value = null
   tegenstanderID.value = null
-  seizoenID.value = null
-  datum.value = lastWednesday()
   beurten.value = null
   speler.value = emptyStats()
   tegenstander.value = emptyStats()
   form.value?.reset()
+  datum.value = keepDatum
+  seizoenID.value = keepSeizoen
 }
 
 onMounted(async () => {
