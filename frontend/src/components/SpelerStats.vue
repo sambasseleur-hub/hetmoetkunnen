@@ -113,6 +113,7 @@ const headers = [
   { title: 'Partijen', key: 'aantalPartijen', sortable: true },
   { title: 'Gewonnen', key: 'gewonnen', sortable: true },
   { title: 'Caramboles', key: 'totaalCaramboles', sortable: true },
+  { title: 'Beurten', key: 'beurten', sortable: true },
   { title: 'Te halen gem.', key: 'teHalenGemiddelde', sortable: true },
   { title: 'Gemiddelde', key: 'gemiddeldePartij', sortable: true },
   { title: 'Plus/Min', key: 'plusMin', sortable: true },

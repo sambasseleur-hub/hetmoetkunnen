@@ -72,6 +72,7 @@ router.get('/', async (req, res) => {
           aantalPartijen: 1,
           gewonnen: 1,
           totaalCaramboles: 1,
+          beurten: '$totaalBeurten',
           gemiddelde: {
             $cond: [
               { $gt: ['$totaalBeurten', 0] },
