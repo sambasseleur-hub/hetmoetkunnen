@@ -6,12 +6,12 @@
       <v-spacer />
       <v-select
         v-model="seizoen"
-        :items="seizoenen"
+        :items="seizoenItems"
         label="Seizoen"
         density="compact"
         hide-details
         clearable
-        style="max-width: 160px"
+        style="max-width: 200px"
         variant="outlined"
         base-color="white"
         color="white"
@@ -97,11 +97,13 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
+import { seizoenItems as toSeizoenItems } from '../utils/seizoen'
 
 const spelers = ref([])
 const seizoenen = ref([])
+const seizoenItems = computed(() => toSeizoenItems(seizoenen.value))
 const weken = ref([])
 const seizoen = ref(null)
 const week = ref(null)

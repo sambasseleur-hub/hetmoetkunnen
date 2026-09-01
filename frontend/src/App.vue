@@ -5,33 +5,33 @@
         <v-icon class="mr-2">mdi-billiards</v-icon>
         Biljarts Tracker
       </v-app-bar-title>
+
+      <v-tabs v-model="tab" align-tabs="end" color="white" slider-color="white">
+        <v-tab :to="{ name: 'rooster' }" value="rooster">
+          <v-icon class="mr-1" size="18">mdi-podium</v-icon>
+          Rooster
+        </v-tab>
+        <v-tab :to="{ name: 'kampioenen' }" value="kampioenen">
+          <v-icon class="mr-1" size="18">mdi-trophy</v-icon>
+          Kampioenen
+        </v-tab>
+        <v-tab :to="{ name: 'beheer' }" value="beheer">
+          <v-icon class="mr-1" size="18">mdi-cog</v-icon>
+          Beheer
+        </v-tab>
+      </v-tabs>
     </v-app-bar>
 
     <v-main class="bg-grey-lighten-4">
       <v-container class="py-8">
-        <SpelerStats class="mb-6" />
-        <SpelerStatBeheer class="mb-6" />
-        <MatchForm @saved="loadMatches" />
-        <MatchList :matches="matches" @deleted="loadMatches" class="mt-6" />
+        <router-view />
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import MatchForm from './components/MatchForm.vue'
-import MatchList from './components/MatchList.vue'
-import SpelerStats from './components/SpelerStats.vue'
-import SpelerStatBeheer from './components/SpelerStatBeheer.vue'
+import { ref } from 'vue'
 
-const matches = ref([])
-
-async function loadMatches() {
-  const { data } = await axios.get('/api/matches')
-  matches.value = data.matches
-}
-
-onMounted(loadMatches)
+const tab = ref('rooster')
 </script>

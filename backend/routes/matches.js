@@ -9,8 +9,57 @@ router.get('/', async (req, res) => {
     const limit = 20
     const skip = (page - 1) * limit
     const total = await Match.countDocuments()
-    const matches = await Match.find().sort({ createdAt: -1 }).skip(skip).limit(limit)
-    console.log(matches.length)
+    const matches = await Match.aggregate([
+      { $sort: { datum: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'lids',
+          localField: 'spelerID',
+          foreignField: 'lidNummer',
+          as: 'speler'
+        }
+      },
+      { $unwind: { path: '$speler', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'lids',
+          localField: 'tegenstanderID',
+          foreignField: 'lidNummer',
+          as: 'tegenstander'
+        }
+      },
+      { $unwind: { path: '$tegenstander', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          partijID: 1,
+          datum: 1,
+          seizoenID: 1,
+          caramboles: 1,
+          aantalCaramboles: 1,
+          beurten: 1,
+          hoogsteSet: 1,
+          gemiddelde: 1,
+          teHalenGemiddelde: 1,
+          plusMin: 1,
+          spelerNaam: {
+            $cond: {
+              if: { $gt: [{ $strLenCP: { $ifNull: ['$speler.schermnaam', ''] } }, 0] },
+              then: '$speler.schermnaam',
+              else: { $concat: [{ $ifNull: ['$speler.voornaam', 'Onbekend'] }, ' ', { $ifNull: ['$speler.achternaam', ''] }] }
+            }
+          },
+          tegenstanderNaam: {
+            $cond: {
+              if: { $gt: [{ $strLenCP: { $ifNull: ['$tegenstander.schermnaam', ''] } }, 0] },
+              then: '$tegenstander.schermnaam',
+              else: { $concat: [{ $ifNull: ['$tegenstander.voornaam', 'Onbekend'] }, ' ', { $ifNull: ['$tegenstander.achternaam', ''] }] }
+            }
+          }
+        }
+      }
+    ])
     res.json({ matches, total, page, totalPages: Math.ceil(total / limit) })
   } catch (err) {
     res.status(500).json({ message: err.message })

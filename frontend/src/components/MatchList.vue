@@ -16,7 +16,7 @@
             </template>
 
             <v-list-item-title class="font-weight-bold">
-              {{ match.spelerID.name }} vs {{ match.tegenstanderID.name }}
+              {{ match.spelerNaam }} vs {{ match.tegenstanderNaam }}
               <v-chip size="small" class="ml-2" :color="winnerColor(match)">
                 {{ winnerLabel(match) }}
               </v-chip>
@@ -50,52 +50,45 @@
   </v-card>
 
   <!-- Detail dialog -->
-  <!-- <v-dialog v-model="detailOpen" max-width="600">
+  <v-dialog v-model="detailOpen" max-width="500">
     <v-card v-if="selected">
       <v-card-title class="bg-green-darken-3 text-white pa-4">
         <v-icon class="mr-2">mdi-billiards</v-icon>
-        {{ selected.player1.name }} vs {{ selected.player2.name }}
+        {{ selected.spelerNaam }} vs {{ selected.tegenstanderNaam }}
       </v-card-title>
       <v-card-text class="pt-4">
         <v-table>
-          <thead>
-            <tr>
-              <th>Statistiek</th>
-              <th class="text-center">{{ selected.player1.name }}</th>
-              <th class="text-center">{{ selected.player2.name }}</th>
-            </tr>
-          </thead>
           <tbody>
             <tr>
               <td><v-icon size="16" class="mr-1">mdi-billiards-rack</v-icon> Caramboles</td>
-              <td class="text-center font-weight-bold">{{ selected.player1.caramboles }}</td>
-              <td class="text-center font-weight-bold">{{ selected.player2.caramboles }}</td>
+              <td class="text-right font-weight-bold">{{ selected.caramboles }} / {{ selected.aantalCaramboles }}</td>
             </tr>
             <tr>
               <td><v-icon size="16" class="mr-1">mdi-star</v-icon> Hoogste serie</td>
-              <td class="text-center">{{ selected.player1.highScore }}</td>
-              <td class="text-center">{{ selected.player2.highScore }}</td>
+              <td class="text-right">{{ selected.hoogsteSet }}</td>
             </tr>
             <tr>
               <td><v-icon size="16" class="mr-1">mdi-rotate-right</v-icon> Beurten</td>
-              <td class="text-center">{{ selected.player1.turns }}</td>
-              <td class="text-center">{{ selected.player2.turns }}</td>
+              <td class="text-right">{{ selected.beurten }}</td>
             </tr>
             <tr>
               <td><v-icon size="16" class="mr-1">mdi-calculator</v-icon> Gemiddelde</td>
-              <td class="text-center">{{ average(selected.player1) }}</td>
-              <td class="text-center">{{ average(selected.player2) }}</td>
+              <td class="text-right">{{ selected.gemiddelde }} / {{ selected.teHalenGemiddelde }}</td>
+            </tr>
+            <tr>
+              <td><v-icon size="16" class="mr-1">mdi-percent</v-icon> Plus/Min</td>
+              <td class="text-right">{{ selected.plusMin }}%</td>
             </tr>
           </tbody>
         </v-table>
-        <div class="text-caption text-grey mt-3">Gespeeld op: {{ formatDate(selected.date) }}</div>
+        <div class="text-caption text-grey mt-3">Gespeeld op: {{ formatDate(selected.datum) }}</div>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn @click="selected = null">Sluiten</v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog> -->
+  </v-dialog>
 </template>
 
 <script setup>
@@ -119,25 +112,14 @@ function formatDate(d) {
   })
 }
 
-function average(player) {
-  if (!player.turns) return '-'
-  return (player.caramboles / player.turns).toFixed(2)
-}
-
 function winnerLabel(match) {
-  console.log(match)
-  const c1 = match.player1.caramboles
-  const c2 = match.player2.caramboles
-  if (c1 > c2) return match.player1.name + ' wint'
-  if (c2 > c1) return match.player2.name + ' wint'
+  if (match.plusMin > 0) return match.spelerNaam + ' wint'
+  if (match.plusMin < 0) return match.tegenstanderNaam + ' wint'
   return 'Gelijk'
 }
 
 function winnerColor(match) {
-  console.log(match)
-  const c1 = match.player1.caramboles
-  const c2 = match.player2.caramboles
-  if (c1 === c2) return 'grey'
+  if (match.plusMin === 0) return 'grey'
   return 'green-darken-3'
 }
 

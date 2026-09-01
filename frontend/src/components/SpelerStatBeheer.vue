@@ -6,12 +6,12 @@
       <v-spacer />
       <v-select
         v-model="seizoen"
-        :items="seizoenen"
+        :items="seizoenItems"
         label="Seizoen"
         density="compact"
         hide-details
         clearable
-        style="max-width: 160px"
+        style="max-width: 200px"
         variant="outlined"
         base-color="white"
         color="white"
@@ -29,6 +29,10 @@
       items-per-page="25"
       class="elevation-0"
     >
+      <template #item.seizoenID="{ item }">
+        {{ seizoenLabel(item.seizoenID) }}
+      </template>
+
       <template #item.actions="{ item }">
         <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
         <v-btn icon="mdi-delete-outline" size="small" variant="text" color="red" :loading="deleting === item._id" @click="remove(item)" />
@@ -106,12 +110,14 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
+import { seizoenLabel, seizoenItems as toSeizoenItems } from '../utils/seizoen'
 
 const stats = ref([])
 const leden = ref([])
 const seizoenen = ref([])
+const seizoenItems = computed(() => toSeizoenItems(seizoenen.value))
 const seizoen = ref(null)
 const loading = ref(false)
 const deleting = ref(null)

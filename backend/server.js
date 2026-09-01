@@ -7,6 +7,7 @@ const matchRoutes = require('./routes/matches')
 const spelerRoutes = require('./routes/spelers')
 const ledenRoutes = require('./routes/leden')
 const spelerStatsRoutes = require('./routes/spelerStats')
+const kampioenenRoutes = require('./routes/kampioenen')
 
 const app = express()
 app.use(cors())
@@ -16,6 +17,7 @@ app.use('/api/matches', matchRoutes)
 app.use('/api/spelers', spelerRoutes)
 app.use('/api/leden', ledenRoutes)
 app.use('/api/speler-stats', spelerStatsRoutes)
+app.use('/api/kampioenen', kampioenenRoutes)
 
 mongoose
   .connect(process.env.MONGO_URI)
