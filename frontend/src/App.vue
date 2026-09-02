@@ -43,7 +43,7 @@
     </v-app-bar>
 
     <v-main class="bg-grey-lighten-4">
-      <v-container class="py-8">
+      <v-container class="py-8 app-container">
         <router-view />
       </v-container>
     </v-main>
@@ -55,3 +55,14 @@ import { ref } from 'vue'
 
 const tab = ref('home')
 </script>
+
+<style scoped>
+.app-container {
+  max-width: 100%;
+}
+@media (min-width: 960px) {
+  .app-container {
+    max-width: 70%;
+  }
+}
+</style>

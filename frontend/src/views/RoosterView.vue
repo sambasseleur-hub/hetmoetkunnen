@@ -176,7 +176,7 @@ import axios from 'axios'
 import OpkomstChart from '../components/OpkomstChart.vue'
 import { seizoenItems as toSeizoenItems } from '../utils/seizoen'
 
-const MIN_PARTIJEN = 12
+const MIN_PARTIJEN = 6
 
 const seizoenen = ref([])
 const seizoenItems = computed(() => toSeizoenItems(seizoenen.value))

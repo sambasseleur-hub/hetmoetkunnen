@@ -4,7 +4,7 @@ const Partij = require('../models/Partij')
 const Lid = require('../models/Lid')
 const Kampioen = require('../models/Kampioen')
 
-const MIN_PARTIJEN_VOOR_RANKING = 12
+const MIN_PARTIJEN_VOOR_RANKING = 6
 const BEURTEN_PER_PARTIJ = 20
 
 function normNaam(s) {
@@ -319,6 +319,64 @@ router.get('/hoogste-serie', async (req, res) => {
     })
 
     res.json({ seizoen, vorigSeizoen, spelers })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+router.get('/laatste-speelavond', async (_req, res) => {
+  try {
+    const laatste = await Partij.findOne().sort({ datum: -1 }).select('datum')
+    if (!laatste) {
+      return res.json({ datum: null, partijen: [], hoogsteSerie: [], besteResultaat: [], meesteCaramboles: [] })
+    }
+
+    const datum = laatste.datum
+
+    const [rijen, lids] = await Promise.all([
+      Partij.find({ datum }),
+      Lid.find({}, 'lidNummer voornaam achternaam schermnaam')
+    ])
+
+    const lidMap = new Map(lids.map(l => [l.lidNummer, l]))
+    function naamVoor(spelerID) {
+      const lid = lidMap.get(spelerID)
+      if (!lid) return 'Onbekend'
+      return lid.schermnaam?.length ? lid.schermnaam : `${lid.voornaam || ''} ${lid.achternaam || ''}`.trim()
+    }
+
+    const partijen = rijen
+      .filter(r => r.spelerID < r.tegenstanderID)
+      .map(r => ({
+        spelerNaam: naamVoor(r.spelerID),
+        tegenstanderNaam: naamVoor(r.tegenstanderID),
+        caramboles: r.caramboles,
+        beurten: r.beurten,
+        gemiddelde: r.gemiddelde,
+        hoogsteSet: r.hoogsteSet,
+        plusMin: r.plusMin
+      }))
+
+    function top3(field) {
+      const bestPerSpeler = new Map()
+      for (const r of rijen) {
+        const naam = naamVoor(r.spelerID)
+        const waarde = r[field]
+        if (!bestPerSpeler.has(naam) || waarde > bestPerSpeler.get(naam)) {
+          bestPerSpeler.set(naam, waarde)
+        }
+      }
+      return [...bestPerSpeler.entries()]
+        .map(([naam, waarde]) => ({ naam, waarde }))
+        .sort((a, b) => b.waarde - a.waarde)
+        .slice(0, 3)
+    }
+
+    const hoogsteSerie = top3('hoogsteSet')
+    const besteResultaat = top3('plusMin')
+    const meesteCaramboles = top3('caramboles')
+
+    res.json({ datum, partijen, hoogsteSerie, besteResultaat, meesteCaramboles })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }

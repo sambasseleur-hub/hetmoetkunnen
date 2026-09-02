@@ -20,6 +20,72 @@
       </v-col>
     </v-row>
 
+    <v-row class="mt-6" dense>
+      <v-col cols="12" md="7">
+        <v-card elevation="2" rounded="lg" height="100%">
+          <v-card-title class="text-subtitle-1 pa-4 d-flex align-center flex-wrap">
+            <v-icon class="mr-2" color="green-darken-3">mdi-calendar-star</v-icon>
+            Laatste speelavond
+            <span v-if="laatsteSpeelavond.datum" class="text-caption text-grey ml-2">
+              {{ formatDate(laatsteSpeelavond.datum) }}
+            </span>
+          </v-card-title>
+
+          <v-list v-if="laatsteSpeelavond.partijen.length" density="comfortable" class="pb-2 evening-list">
+            <template v-for="(p, i) in laatsteSpeelavond.partijen" :key="i">
+              <v-list-item>
+                <v-list-item-title>
+                  <span :class="{ 'font-weight-bold': p.plusMin >= 0 }">{{ p.spelerNaam }}</span>
+                  <span class="text-grey mx-1">–</span>
+                  <span :class="{ 'font-weight-bold': p.plusMin < 0 }">{{ p.tegenstanderNaam }}</span>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ p.caramboles }} car. in {{ p.beurten }} beurten &middot; moy. {{ round2(p.gemiddelde) }}
+                </v-list-item-subtitle>
+              </v-list-item>
+              <v-divider v-if="i < laatsteSpeelavond.partijen.length - 1" />
+            </template>
+          </v-list>
+          <div v-else class="pa-8 text-center text-grey">
+            <v-icon size="40" class="mb-2">mdi-billiards</v-icon>
+            <div>Nog geen partijen gespeeld.</div>
+          </div>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" md="5">
+        <v-card elevation="2" rounded="lg" height="100%">
+          <v-card-title class="text-subtitle-1 pa-4 d-flex align-center">
+            <v-icon class="mr-2" color="green-darken-3">mdi-star-outline</v-icon>
+            Hoogtepunten
+          </v-card-title>
+
+          <div v-if="laatsteSpeelavond.datum" class="pa-4 pt-2">
+            <div v-for="cat in hoogtepuntCategorieen" :key="cat.key" class="mb-4">
+              <div class="d-flex align-center mb-1">
+                <v-icon size="18" color="green-darken-3" class="mr-2">{{ cat.icon }}</v-icon>
+                <span class="text-subtitle-2 font-weight-medium">{{ cat.label }}</span>
+              </div>
+              <div
+                v-for="(item, i) in laatsteSpeelavond[cat.key]"
+                :key="item.naam"
+                class="d-flex align-center py-1"
+              >
+                <span class="podium-rank" :class="`rank-${i + 1}`">{{ i + 1 }}</span>
+                <span class="flex-grow-1">{{ item.naam }}</span>
+                <span class="text-grey text-body-2">{{ cat.format(item.waarde) }}</span>
+              </div>
+              <div v-if="!laatsteSpeelavond[cat.key].length" class="text-grey text-body-2">–</div>
+            </div>
+          </div>
+          <div v-else class="pa-8 text-center text-grey">
+            <v-icon size="40" class="mb-2">mdi-star-off-outline</v-icon>
+            <div>Nog geen hoogtepunten.</div>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <v-card elevation="2" rounded="lg" class="mt-6">
       <v-card-title class="text-subtitle-1 pa-4 d-flex align-center">
         <v-icon class="mr-2" color="green-darken-3">mdi-newspaper-variant-outline</v-icon>
@@ -54,6 +120,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const laatsteNieuws = ref([])
+const laatsteSpeelavond = ref({ datum: null, partijen: [], hoogsteSerie: null, besteResultaat: null, meesteCaramboles: null })
 
 const quickLinks = [
   { to: { name: 'rooster' }, icon: 'mdi-podium', label: 'Rooster' },
@@ -66,9 +133,23 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('nl-NL', { day: '2-digit', month: 'long', year: 'numeric' })
 }
 
+function round2(n) {
+  return Math.round(n * 100) / 100
+}
+
+const hoogtepuntCategorieen = [
+  { key: 'hoogsteSerie', label: 'Hoogste serie', icon: 'mdi-trophy-outline', format: (v) => v },
+  { key: 'besteResultaat', label: 'Beste resultaat', icon: 'mdi-trending-up', format: (v) => `${v > 0 ? '+' : ''}${round2(v)}%` },
+  { key: 'meesteCaramboles', label: 'Meeste caramboles', icon: 'mdi-billiards-rack', format: (v) => v }
+]
+
 onMounted(async () => {
-  const { data } = await axios.get('/api/nieuws')
-  laatsteNieuws.value = data.slice(0, 4)
+  const [nieuwsRes, speelavondRes] = await Promise.all([
+    axios.get('/api/nieuws'),
+    axios.get('/api/spelers/laatste-speelavond')
+  ])
+  laatsteNieuws.value = nieuwsRes.data.slice(0, 4)
+  laatsteSpeelavond.value = speelavondRes.data
 })
 </script>
 
@@ -110,6 +191,33 @@ onMounted(async () => {
 .sponsor-logo {
   height: 40px;
   width: auto;
+}
+.evening-list {
+  max-height: 340px;
+  overflow-y: auto;
+}
+.podium-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: white;
+  margin-right: 10px;
+  flex-shrink: 0;
+  background: #9e9e9e;
+}
+.podium-rank.rank-1 {
+  background: #c9a227;
+}
+.podium-rank.rank-2 {
+  background: #9aa0a6;
+}
+.podium-rank.rank-3 {
+  background: #a1662f;
 }
 @media (max-width: 600px) {
   .hero {

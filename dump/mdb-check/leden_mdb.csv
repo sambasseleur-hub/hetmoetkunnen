@@ -1,0 +1,72 @@
+LidNummer,ActiefLid,Voornaam,Achternaam,AantalCaramboles,Soortlid,Schermnaam
+5,0,"Simon-Dirk de","Boer",13,"Spelend","Simon-Dirk"
+6,1,"Ton","Buijs",33,"Spelend","Ton Taxi"
+10,0,"Jan","Conijn",23,"Spelend","Jan"
+11,1,"René","Dijkhuizen",29,"Steunend","René"
+14,1,"Paul","Kemper",19,"Spelend","Paul"
+19,1,"Martin","Nibbering",28,"Spelend","Martin"
+21,0,"Hans van","Pelt",27,"Spelend","Hans"
+23,1,"Peter","Smidt",32,"Spelend","Peter"
+25,1,"Reinier","Stijvers",33,"Spelend","Reinier"
+26,1,"Erik","Vink",111,"Spelend","Erik"
+29,0,"Piet","Nordmann",40,"Erelid","Piet"
+35,1,"Edwin","Schans",21,"Spelend","Edwin"
+40,0,"Ton","Verheij",44,"Spelend","Ton V"
+41,1,"Marco","Wölfel",21,"Steunend","Marco Bull"
+42,1,"Ron","Hulskemper",39,"Spelend","Ron"
+43,1,"Ronald","Basseleur",70,"Spelend","Ronald"
+44,1,"Ben","Hildesheim",35,"Spelend","Ben"
+45,0,"Wil","Bouman",20,"Spelend","Wil"
+46,1,"Frans","Langkemper",22,"Spelend","Frans"
+47,1,"Dennis","Langkemper",19,"Spelend","Dennis"
+49,1,"Justin","Langkemper",30,"Spelend","Justin"
+53,1,"Greet","Langkemper",14,"Spelend","Greet"
+54,0,"Marjo","Verheij",23,"Spelend","Marjo"
+56,1,"Herman","Marsman",13,"Steunend","Herman"
+57,1,"Jean Paul","Pronk",20,"Spelend","Jean Paul"
+59,1,"Sam","Basseleur",15,"Spelend","Sam"
+60,1,"Stijn","Buijs",13,"Spelend","Stijn"
+62,0,"Watcharin","Luyckx",15,"Spelend","Watcharin"
+63,1,"Jacco","Mak",34,"Spelend","Jacco"
+64,1,"Manja","Schans",13,"Spelend","Manja"
+69,1,"Tijmen","Lustig",35,"Spelend","Tijmen"
+70,0,"Simon de","Boer",13,"Spelend","Simon"
+71,1,"Koert","Veld",20,"Steunend","Koert"
+17,0,"Dennis van","Montfort",52,"Spelend",
+61,1,"Henk de","Vries",28,"Steunend","Henk de"
+55,0,"Introducee","Gastspeler",25,"Gastspeler",
+65,0,"Int_Max","Schuitenmaker",61,"Gastspeler","Max_Intro"
+66,0,"Int_Paul","Maas",27,"Gastspeler","Paul_Intro"
+67,0,"Int_Ruud","Basseleur",34,"Gastspeler","Ruud_Intro"
+68,0,"Int_Wim","Zijp",115,"Gastspeler","Wim_Intro"
+72,0,"Int_Sierk","Heida",30,"Gastspeler","Sierk_Intro"
+33,1,"Rique","Bleeker",35,"Steunend","Rique"
+51,1,"Hen de","Boer",85,"Steunend","Hen"
+16,0,"Rolph","Meijer",73,"Spelend",
+4,0,"Rob de","Boer",33,"Spelend",
+1,0,"Rob","Bleeker",21,"Spelend",
+9,0,"René","Butter",25,"Spelend",
+34,0,"Peter","Bleeker",49,"Spelend",
+36,0,"Paul","Bleeker",15,"Spelend",
+32,0,"Mirjam","Groot",15,"Spelend",
+7,0,"Melvin","Boucher",19,"Spelend",
+30,0,"Max","Schuitemaker",69,"Spelend",
+27,0,"Marijn van","Zanten",30,"Spelend",
+52,0,"Mandy","Mulder",13,"Spelend",
+3,0,"Klaas de","Boer",34,"Spelend",
+38,0,"Kees","Bouman",20,"Spelend",
+58,0,"Joseph","Coulthard",13,"Spelend",
+28,0,"John","Vlasbloem",35,"Spelend",
+24,0,"Johan","Stapel",14,"Spelend",
+12,0,"Jasper","Hagedorn",28,"Spelend",
+39,0,"Jan","Dierdorp",15,"Spelend",
+13,0,"Jack","Kemper",17,"Spelend",
+20,0,"Ingmar","Ooms",22,"Spelend",
+18,0,"Henk van de","Nes",18,"Spelend",
+15,0,"Henk","Medik",38,"Spelend",
+8,0,"Gerrit van","Busschbach",21,"Spelend",
+48,0,"Gary","Karst",14,"Spelend",
+37,0,"Frank","Schilder",28,"Spelend",
+22,0,"Bas","Romijn",17,"Spelend",
+2,0,"Arjan de","Boer",10,"Spelend",
+74,1,"Koen","Keizer",13,"Spelend","Koen"
