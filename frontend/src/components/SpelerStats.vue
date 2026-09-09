@@ -196,4 +196,12 @@ onMounted(async () => {
   await loadWeken()
   await loadSpelers()
 })
+
+async function refresh() {
+  await loadSeizioenen()
+  await loadWeken()
+  await loadSpelers()
+}
+
+defineExpose({ refresh })
 </script>

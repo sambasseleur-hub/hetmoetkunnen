@@ -11,7 +11,7 @@
           <v-list-item>
             <template #prepend>
               <v-avatar color="green-darken-3" class="text-white">
-                {{ i + 1 }}
+                {{ (page - 1) * 20 + i + 1 }}
               </v-avatar>
             </template>
 
@@ -47,6 +47,16 @@
         <div>Nog geen partijen opgeslagen.</div>
       </div>
     </v-card-text>
+
+    <v-card-actions v-if="totalPages > 1" class="justify-center pb-4">
+      <v-pagination
+        :model-value="page"
+        :length="totalPages"
+        density="comfortable"
+        :total-visible="7"
+        @update:model-value="(p) => emit('update:page', p)"
+      />
+    </v-card-actions>
   </v-card>
 
   <!-- Detail dialog -->
@@ -95,8 +105,12 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
 
-const props = defineProps({ matches: Array })
-const emit = defineEmits(['deleted'])
+const props = defineProps({
+  matches: Array,
+  page: { type: Number, default: 1 },
+  totalPages: { type: Number, default: 1 }
+})
+const emit = defineEmits(['deleted', 'update:page'])
 
 const selected = ref(null)
 const detailOpen = computed({

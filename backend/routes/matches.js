@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
     const skip = (page - 1) * limit
     const total = await Match.countDocuments()
     const matches = await Match.aggregate([
-      { $sort: { datum: -1 } },
+      { $sort: { _id: -1 } },
       { $skip: skip },
       { $limit: limit },
       {
