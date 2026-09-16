@@ -1,4 +1,10 @@
 <template>
+  <div class="d-flex justify-end mb-4">
+    <v-btn variant="tonal" color="red-darken-1" prepend-icon="mdi-logout" @click="logout">
+      Uitloggen
+    </v-btn>
+  </div>
+
   <SpelerStats ref="spelerStats" class="mb-6" />
   <SpelerStatBeheer class="mb-6" />
   <MatchForm @saved="onMatchSaved" />
@@ -14,12 +20,15 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import MatchForm from '../components/MatchForm.vue'
 import MatchList from '../components/MatchList.vue'
 import SpelerStats from '../components/SpelerStats.vue'
 import SpelerStatBeheer from '../components/SpelerStatBeheer.vue'
+import { clearToken } from '../utils/auth'
 
+const router = useRouter()
 const matches = ref([])
 const page = ref(1)
 const totalPages = ref(1)
@@ -40,6 +49,11 @@ async function onMatchSaved() {
   page.value = 1
   await loadMatches()
   await spelerStats.value?.refresh()
+}
+
+function logout() {
+  clearToken()
+  router.push({ name: 'home' })
 }
 
 onMounted(loadMatches)

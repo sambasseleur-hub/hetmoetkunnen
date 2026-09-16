@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Match = require('../models/Partij')
+const requireAuth = require('../middleware/requireAuth')
 
 // Get all matches (paginated)
 router.get('/', async (req, res) => {
@@ -78,7 +79,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // Create match
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const last = await Match.findOne().sort({ partijID: -1 }).select('partijID')
     const partijID = (last?.partijID || 0) + 1
@@ -91,7 +92,7 @@ router.post('/', async (req, res) => {
 })
 
 // Delete match
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const match = await Match.findByIdAndDelete(req.params.id)
     if (!match) return res.status(404).json({ message: 'Match not found' })

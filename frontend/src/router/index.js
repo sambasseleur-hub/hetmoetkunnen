@@ -8,6 +8,8 @@ import NieuwsView from '../views/NieuwsView.vue'
 import FotosView from '../views/FotosView.vue'
 import SpelersView from '../views/SpelersView.vue'
 import SpelerDetailView from '../views/SpelerDetailView.vue'
+import LoginView from '../views/LoginView.vue'
+import { isLoggedIn } from '../utils/auth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,8 +22,15 @@ const router = createRouter({
     { path: '/wie-zijn-wij', name: 'wie-zijn-wij', component: WieZijnWijView },
     { path: '/nieuws', name: 'nieuws', component: NieuwsView },
     { path: '/fotos', name: 'fotos', component: FotosView },
+    { path: '/login', name: 'login', component: LoginView },
     { path: '/beheer', name: 'beheer', component: DashboardView }
   ]
+})
+
+router.beforeEach((to) => {
+  if (to.name === 'beheer' && !isLoggedIn()) {
+    return { name: 'login' }
+  }
 })
 
 export default router

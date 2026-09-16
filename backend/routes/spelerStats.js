@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const SpelerStat = require('../models/SpelerStat')
 const Lid = require('../models/Lid')
+const requireAuth = require('../middleware/requireAuth')
 
 router.get('/', async (req, res) => {
   try {
@@ -43,7 +44,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const stat = new SpelerStat(req.body)
     const saved = await stat.save()
@@ -56,7 +57,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const updated = await SpelerStat.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
     if (!updated) return res.status(404).json({ message: 'Niet gevonden' })
@@ -66,7 +67,7 @@ router.put('/:id', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const deleted = await SpelerStat.findByIdAndDelete(req.params.id)
     if (!deleted) return res.status(404).json({ message: 'Niet gevonden' })

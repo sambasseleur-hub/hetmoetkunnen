@@ -36,12 +36,15 @@
         <div>Geen spelers gevonden.</div>
       </div>
     </v-card>
+
+    <SpelerStats default-latest-seizoen class="mt-6" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import SpelerStats from '../components/SpelerStats.vue'
 
 const spelers = ref([])
 const loading = ref(false)

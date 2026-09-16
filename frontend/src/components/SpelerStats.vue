@@ -101,6 +101,10 @@ import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
 import { seizoenItems as toSeizoenItems } from '../utils/seizoen'
 
+const props = defineProps({
+  defaultLatestSeizoen: { type: Boolean, default: false }
+})
+
 const spelers = ref([])
 const seizoenen = ref([])
 const seizoenItems = computed(() => toSeizoenItems(seizoenen.value))
@@ -162,6 +166,9 @@ async function openDetail(speler) {
 async function loadSeizioenen() {
   const { data } = await axios.get('/api/spelers/seizoenen')
   seizoenen.value = data
+  if (props.defaultLatestSeizoen && !seizoen.value && data.length) {
+    seizoen.value = data[0]
+  }
 }
 
 async function loadWeken() {

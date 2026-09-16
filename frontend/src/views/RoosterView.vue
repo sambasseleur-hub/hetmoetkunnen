@@ -18,6 +18,9 @@
           class="text-white"
         />
       </v-card-title>
+      <v-card-subtitle v-if="vorigSeizoenLabel" class="bg-green-darken-3 text-white pb-3" style="opacity: 0.85">
+        Vorig rooster: {{ vorigSeizoenLabel }}
+      </v-card-subtitle>
 
       <v-card-text class="pa-6">
         <v-row dense>
@@ -33,14 +36,23 @@
     </v-card>
 
     <v-card elevation="2" rounded="lg" class="mb-6">
-      <v-card-title class="text-subtitle-1 pa-4 d-flex align-center">
+      <v-card-title class="text-subtitle-1 pa-4 d-flex align-center flex-wrap">
         <v-icon class="mr-2" color="green-darken-3">mdi-format-list-numbered</v-icon>
         Klassement
+        <v-spacer />
+        <div v-if="movers.omhoog || movers.omlaag" class="d-flex ga-2">
+          <v-chip size="small" color="green-darken-2" variant="flat" prepend-icon="mdi-arrow-up-bold">
+            {{ movers.omhoog }}
+          </v-chip>
+          <v-chip size="small" color="red-darken-1" variant="flat" prepend-icon="mdi-arrow-down-bold">
+            {{ movers.omlaag }}
+          </v-chip>
+        </div>
       </v-card-title>
 
       <v-data-table
         :headers="headers"
-        :items="spelers"
+        :items="spelersWeergave"
         :loading="loading"
         items-per-page="30"
         density="comfortable"
@@ -60,6 +72,10 @@
 
         <template #item.naam="{ item }">
           <span class="font-weight-medium">{{ item.naam }}</span>
+          <div v-if="mobile && (item.clubKampioen || item.omeJaapKampioen)" class="trophy-icons mt-1">
+            <v-icon v-for="n in item.clubKampioen" :key="'c' + n" size="13" color="amber-darken-2">mdi-star</v-icon>
+            <v-icon v-for="n in item.omeJaapKampioen" :key="'o' + n" size="13" color="amber-darken-2">mdi-trophy</v-icon>
+          </div>
         </template>
 
         <template #item.clubKampioen="{ item }">
@@ -80,6 +96,18 @@
           <span class="text-green-darken-2">{{ item.gewonnen }}</span>
           <span class="text-grey"> / {{ item.gelijk }} / </span>
           <span class="text-red-darken-1">{{ item.verloren }}</span>
+        </template>
+
+        <template #item.toekomstCar="{ item }">
+          <span :class="toekomstClass(item)">{{ item.toekomstCar }}</span>
+        </template>
+
+        <template #item.toekomstCarAfgerond="{ item }">
+          <span :class="toekomstClass(item)">{{ item.toekomstCarAfgerond }}</span>
+        </template>
+
+        <template #item.toekomstMoy="{ item }">
+          <span :class="toekomstClass(item)">{{ item.toekomstMoy }}</span>
         </template>
 
         <template #item.plusMin="{ item }">
@@ -121,46 +149,52 @@
         Hoogste Serie
       </v-card-title>
 
-      <v-table density="comfortable" class="hs-table">
-        <thead>
-          <tr>
-            <th rowspan="2" class="align-bottom">#</th>
-            <th rowspan="2" class="align-bottom">Naam</th>
-            <th rowspan="2" class="align-bottom text-end">Car.</th>
-            <th colspan="3" class="text-center hs-group-header">Dit seizoen</th>
-            <th colspan="3" class="text-center hs-group-header">Alle roosters</th>
-          </tr>
-          <tr>
-            <th class="text-end">HS</th>
-            <th class="text-end">HS%</th>
-            <th class="text-center">Was</th>
-            <th class="text-end">HS</th>
-            <th>Gemaakt op</th>
-            <th>Laatste keer</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="s in hoogsteSerie" :key="s.spelerID">
-            <td>{{ s.rank }}</td>
-            <td class="font-weight-medium">{{ s.naam }}</td>
-            <td class="text-end">{{ s.car }}</td>
-            <td class="text-end">{{ s.hsSeizoen }}</td>
-            <td class="text-end">{{ s.hsPercent }}%</td>
-            <td class="text-center">
-              <span v-if="s.was > 0" class="text-green-darken-2">
-                <v-icon size="14">mdi-arrow-up-bold</v-icon>{{ s.was }}
-              </span>
-              <span v-else-if="s.was < 0" class="text-red-darken-1">
-                <v-icon size="14">mdi-arrow-down-bold</v-icon>{{ Math.abs(s.was) }}
-              </span>
-              <span v-else class="text-grey-lighten-1">–</span>
-            </td>
-            <td class="text-end">{{ s.hsAlleTijden ?? '–' }}</td>
-            <td>{{ formatDate(s.gemaaktOp) }}</td>
-            <td>{{ s.laatsteKeer ? formatDate(s.laatsteKeer) : '–' }}</td>
-          </tr>
-        </tbody>
-      </v-table>
+      <div class="table-scroll">
+        <v-table density="comfortable" class="hs-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="align-bottom">#</th>
+              <th rowspan="2" class="align-bottom">Naam</th>
+              <th v-if="!mobile" rowspan="2" class="align-bottom text-end">Car.</th>
+              <th colspan="3" class="text-center hs-group-header">Dit seizoen</th>
+              <th v-if="!mobile" colspan="3" class="text-center hs-group-header">Alle roosters</th>
+            </tr>
+            <tr>
+              <th class="text-end">HS</th>
+              <th class="text-end">HS%</th>
+              <th class="text-center">Was</th>
+              <template v-if="!mobile">
+                <th class="text-end">HS</th>
+                <th>Gemaakt op</th>
+                <th>Laatste keer</th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="s in hoogsteSerie" :key="s.spelerID">
+              <td>{{ s.rank }}</td>
+              <td class="font-weight-medium">{{ s.naam }}</td>
+              <td v-if="!mobile" class="text-end">{{ s.car }}</td>
+              <td class="text-end">{{ s.hsSeizoen }}</td>
+              <td class="text-end">{{ s.hsPercent }}%</td>
+              <td class="text-center">
+                <span v-if="s.was > 0" class="text-green-darken-2">
+                  <v-icon size="14">mdi-arrow-up-bold</v-icon>{{ s.was }}
+                </span>
+                <span v-else-if="s.was < 0" class="text-red-darken-1">
+                  <v-icon size="14">mdi-arrow-down-bold</v-icon>{{ Math.abs(s.was) }}
+                </span>
+                <span v-else class="text-grey-lighten-1">–</span>
+              </td>
+              <template v-if="!mobile">
+                <td class="text-end">{{ s.hsAlleTijden ?? '–' }}</td>
+                <td>{{ formatDate(s.gemaaktOp) }}</td>
+                <td>{{ s.laatsteKeer ? formatDate(s.laatsteKeer) : '–' }}</td>
+              </template>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
 
       <div v-if="!hoogsteSerieLoading && !hoogsteSerie.length" class="pa-8 text-center text-grey">
         <v-icon size="48" class="mb-2">mdi-account-off</v-icon>
@@ -172,9 +206,12 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useDisplay } from 'vuetify'
 import axios from 'axios'
 import OpkomstChart from '../components/OpkomstChart.vue'
-import { seizoenItems as toSeizoenItems } from '../utils/seizoen'
+import { seizoenItems as toSeizoenItems, seizoenLabel } from '../utils/seizoen'
+
+const { mobile } = useDisplay()
 
 const MIN_PARTIJEN = 6
 
@@ -182,23 +219,39 @@ const seizoenen = ref([])
 const seizoenItems = computed(() => toSeizoenItems(seizoenen.value))
 const seizoen = ref(null)
 const spelers = ref([])
+const spelersVorig = ref([])
 const avonden = ref([])
 const hoogsteSerie = ref([])
 const loading = ref(false)
 const hoogsteSerieLoading = ref(false)
 
-const headers = [
+const desktopHeaders = [
   { title: '#', key: 'rank', sortable: false, width: 56 },
   { title: 'Naam', key: 'naam', sortable: false },
-  { title: 'Club', key: 'clubKampioen', sortable: false, align: 'center' },
-  { title: 'Ome Jaap', key: 'omeJaapKampioen', sortable: false, align: 'center' },
+  { title: 'Club', key: 'clubKampioen', sortable: false, align: 'center', width: 60 },
+  { title: 'Ome Jaap', key: 'omeJaapKampioen', sortable: false, align: 'center', width: 60 },
   { title: 'Partijen', key: 'aantalPartijen', sortable: false, align: 'end' },
   { title: 'Car.', key: 'totaalCaramboles', sortable: false, align: 'end' },
   { title: 'Beurten', key: 'beurten', sortable: false, align: 'end' },
   { title: 'Moy.', key: 'gemiddelde', sortable: false, align: 'end' },
+  { title: 'Toekomst Car.', key: 'toekomstCar', sortable: false, align: 'end' },
+  { title: 'Afgerond', key: 'toekomstCarAfgerond', sortable: false, align: 'end' },
+  { title: 'Toekomst Moy.', key: 'toekomstMoy', sortable: false, align: 'end' },
   { title: 'W / G / V', key: 'record', sortable: false, align: 'center' },
   { title: 'Resultaat', key: 'plusMin', sortable: false, align: 'end' }
 ]
+
+const mobileHeaders = [
+  { title: '#', key: 'rank', sortable: false, width: 32 },
+  { title: 'Naam', key: 'naam', sortable: false },
+  { title: 'Partijen', key: 'aantalPartijen', sortable: false, align: 'end' },
+  { title: 'Moy.', key: 'gemiddelde', sortable: false, align: 'end' },
+  { title: 'Toekomst Car.', key: 'toekomstCar', sortable: false, align: 'end' },
+  { title: 'W / G / V', key: 'record', sortable: false, align: 'center' },
+  { title: 'Resultaat', key: 'plusMin', sortable: false, align: 'end' }
+]
+
+const headers = computed(() => mobile.value ? mobileHeaders : desktopHeaders)
 
 function formatDate(d) {
   if (!d) return '-'
@@ -221,6 +274,52 @@ function rankOf(item) {
 function rowProps({ item }) {
   return item.gekwalificeerd ? {} : { class: 'text-grey' }
 }
+
+function toekomstClass(item) {
+  if (item.toekomstMoy > item.teHalenGemiddelde) return 'text-green-darken-2'
+  if (item.toekomstMoy < item.teHalenGemiddelde) return 'text-red-darken-1'
+  return ''
+}
+
+const vorigSeizoen = computed(() => {
+  if (!seizoen.value || !seizoenen.value.length) return null
+  const idx = seizoenen.value.indexOf(seizoen.value)
+  return idx >= 0 && idx < seizoenen.value.length - 1 ? seizoenen.value[idx + 1] : null
+})
+
+const vorigSeizoenLabel = computed(() => vorigSeizoen.value ? seizoenLabel(vorigSeizoen.value) : null)
+
+const BEURTEN_PER_PARTIJ = 20
+
+const vorigPlusMinMap = computed(() => new Map(spelersVorig.value.map(s => [s.spelerID, s.plusMin])))
+const vorigGemiddeldeMap = computed(() => new Map(spelersVorig.value.map(s => [s.spelerID, s.gemiddelde])))
+
+const spelersWeergave = computed(() => spelers.value.map(s => {
+  const heeftVorig = vorigPlusMinMap.value.has(s.spelerID)
+  const plusMinVorig = heeftVorig ? vorigPlusMinMap.value.get(s.spelerID) : null
+  let res = null
+  if (heeftVorig) {
+    res = s.plusMin > plusMinVorig ? 'up' : s.plusMin < plusMinVorig ? 'down' : 'equal'
+  }
+
+  const gemiddeldeVorig = vorigGemiddeldeMap.value.get(s.spelerID)
+  const toekomstMoyRuw = gemiddeldeVorig !== undefined ? (s.gemiddelde + gemiddeldeVorig) / 2 : s.gemiddelde
+  const toekomstMoy = Math.round(toekomstMoyRuw * 1000) / 1000
+  const toekomstCarAfgerond = Math.round(toekomstMoyRuw * BEURTEN_PER_PARTIJ * 100) / 100
+  const toekomstCar = Math.round(toekomstCarAfgerond)
+
+  return { ...s, plusMinVorig, res, toekomstMoy, toekomstCarAfgerond, toekomstCar }
+}))
+
+const movers = computed(() => {
+  let omhoog = 0
+  let omlaag = 0
+  for (const s of spelersWeergave.value) {
+    if (s.res === 'up') omhoog++
+    else if (s.res === 'down') omlaag++
+  }
+  return { omhoog, omlaag }
+})
 
 const tiles = computed(() => {
   const totaalPartijen = spelers.value.reduce((sum, s) => sum + (s.aantalPartijen || 0), 0)
@@ -254,6 +353,15 @@ async function loadSpelers() {
   }
 }
 
+async function loadSpelersVorig() {
+  if (!vorigSeizoen.value) {
+    spelersVorig.value = []
+    return
+  }
+  const { data } = await axios.get('/api/spelers', { params: { seizoen: vorigSeizoen.value } })
+  spelersVorig.value = data
+}
+
 async function loadOpkomst() {
   const params = seizoen.value ? { seizoen: seizoen.value } : {}
   const { data } = await axios.get('/api/spelers/opkomst', { params })
@@ -273,13 +381,14 @@ async function loadHoogsteSerie() {
 
 watch(seizoen, () => {
   loadSpelers()
+  loadSpelersVorig()
   loadOpkomst()
   loadHoogsteSerie()
 })
 
 onMounted(async () => {
   await loadSeizoenen()
-  await Promise.all([loadSpelers(), loadOpkomst(), loadHoogsteSerie()])
+  await Promise.all([loadSpelers(), loadSpelersVorig(), loadOpkomst(), loadHoogsteSerie()])
 })
 </script>
 
@@ -306,6 +415,12 @@ onMounted(async () => {
 .rooster-table :deep(th) {
   font-weight: 600 !important;
 }
+.rooster-table :deep(td:nth-child(3)),
+.rooster-table :deep(td:nth-child(4)),
+.rooster-table :deep(th:nth-child(3)),
+.rooster-table :deep(th:nth-child(4)) {
+  padding: 0 4px !important;
+}
 .trophy-icons {
   display: inline-flex;
   gap: 2px;
@@ -313,6 +428,29 @@ onMounted(async () => {
 .hs-table :deep(th),
 .hs-table :deep(td) {
   padding: 0 12px;
+  white-space: nowrap;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+@media (max-width: 600px) {
+  .stat-value {
+    font-size: 1.15rem;
+  }
+  .stat-label {
+    font-size: 0.68rem;
+  }
+  .hs-table :deep(th),
+  .hs-table :deep(td) {
+    padding: 0 8px;
+    font-size: 0.8rem;
+  }
+  .rooster-table :deep(th),
+  .rooster-table :deep(td) {
+    padding: 0 5px !important;
+    font-size: 0.76rem;
+    white-space: nowrap;
+  }
 }
 .hs-group-header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
