@@ -242,7 +242,7 @@ const mobileHeaders = [
   { title: 'Naam', key: 'naam', sortable: false },
   { title: 'Partijen', key: 'aantalPartijen', sortable: false, align: 'end' },
   { title: 'Moy.', key: 'gemiddelde', sortable: false, align: 'end' },
-  { title: 'Toekomst Car.', key: 'toekomstCar', sortable: false, align: 'end' },
+  { title: 'T. Car.', key: 'toekomstCar', sortable: false, align: 'end' },
   { title: 'W / G / V', key: 'record', sortable: false, align: 'center' },
   { title: 'Resultaat', key: 'plusMin', sortable: false, align: 'end' }
 ]
