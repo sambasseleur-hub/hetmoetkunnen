@@ -3,6 +3,7 @@ const router = express.Router()
 const Partij = require('../models/Partij')
 const Lid = require('../models/Lid')
 const Kampioen = require('../models/Kampioen')
+const SpelerStat = require('../models/SpelerStat')
 
 const MIN_PARTIJEN_VOOR_RANKING = 6
 const BEURTEN_PER_PARTIJ = 20
@@ -33,7 +34,11 @@ async function kampioenenPerLid() {
 
 router.get('/seizoenen', async (_req, res) => {
   try {
-    const seizoenen = await Partij.distinct('seizoenID')
+    const [uitPartijen, uitSpelerStats] = await Promise.all([
+      Partij.distinct('seizoenID'),
+      SpelerStat.distinct('seizoenID')
+    ])
+    const seizoenen = [...new Set([...uitPartijen, ...uitSpelerStats])]
     res.json(seizoenen.filter(Boolean).sort((a, b) => b - a))
   } catch (err) {
     res.status(500).json({ message: err.message })

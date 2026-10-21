@@ -5,17 +5,18 @@
     </v-btn>
   </div>
 
-  <SpelerStats ref="spelerStats" class="mb-6" />
-  <SpelerStatBeheer class="mb-6" />
-  <MatchForm @saved="onMatchSaved" />
+  <MatchForm @saved="onMatchSaved" class="mb-6" />
   <MatchList
     :matches="matches"
     :page="page"
     :total-pages="totalPages"
     @update:page="changePage"
     @deleted="loadMatches"
-    class="mt-6"
+    class="mb-6"
   />
+  <SpelerStats ref="spelerStats" class="mb-6" />
+  <SpelerStatBeheer class="mb-6" />
+  <LedenBeheer class="mb-6" />
 </template>
 
 <script setup>
@@ -26,6 +27,7 @@ import MatchForm from '../components/MatchForm.vue'
 import MatchList from '../components/MatchList.vue'
 import SpelerStats from '../components/SpelerStats.vue'
 import SpelerStatBeheer from '../components/SpelerStatBeheer.vue'
+import LedenBeheer from '../components/LedenBeheer.vue'
 import { clearToken } from '../utils/auth'
 
 const router = useRouter()

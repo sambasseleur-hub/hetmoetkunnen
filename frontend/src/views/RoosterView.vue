@@ -72,10 +72,6 @@
 
         <template #item.naam="{ item }">
           <span class="font-weight-medium">{{ item.naam }}</span>
-          <div v-if="mobile && (item.clubKampioen || item.omeJaapKampioen)" class="trophy-icons mt-1">
-            <v-icon v-for="n in item.clubKampioen" :key="'c' + n" size="13" color="amber-darken-2">mdi-star</v-icon>
-            <v-icon v-for="n in item.omeJaapKampioen" :key="'o' + n" size="13" color="amber-darken-2">mdi-trophy</v-icon>
-          </div>
         </template>
 
         <template #item.clubKampioen="{ item }">

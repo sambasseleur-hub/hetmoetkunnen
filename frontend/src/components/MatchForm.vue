@@ -12,6 +12,7 @@
         <v-row>
           <v-col cols="12" md="4">
             <v-select
+              ref="spelerField"
               v-model="spelerID"
               :items="leden"
               item-title="label"
@@ -129,7 +130,7 @@
         </v-alert>
 
         <div class="d-flex justify-end gap-2 mt-2">
-          <v-btn variant="text" @click="reset">Reset</v-btn>
+          <v-btn variant="text" tabindex="-1" @click="reset">Reset</v-btn>
           <v-btn type="submit" color="green-darken-3" :loading="saving" :disabled="!valid" prepend-icon="mdi-content-save">
             Opslaan
           </v-btn>
@@ -147,12 +148,13 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import axios from 'axios'
 
 const emit = defineEmits(['saved'])
 
 const form = ref(null)
+const spelerField = ref(null)
 const valid = ref(false)
 const saving = ref(false)
 const snackbar = ref(false)
@@ -222,6 +224,8 @@ async function submit() {
     snackbar.value = true
     reset()
     emit('saved')
+    await nextTick()
+    spelerField.value?.focus()
   } catch (err) {
     error.value = err.response?.data?.message || 'Er is iets misgegaan'
   } finally {
